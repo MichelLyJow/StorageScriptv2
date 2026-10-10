@@ -2,23 +2,57 @@
 // Public URL: https://<your-domain>/loaders/<id>  (mapped here by vercel.json rewrites)
 //
 // Behaviour:
-//  - Request looks like a real web browser  -> troll "NICE TRY" page (HTML)
-//  - Request looks like a Roblox executor's HttpGet -> raw Lua code (text/plain)
+//  - A real browser navigating to the link -> troll "NICE TRY" page (HTML)
+//  - A Roblox executor calling game:HttpGet(...) -> raw Lua code (text/plain)
 //
 // The real code is fetched server-side from the Firebase Realtime Database,
 // so it is never shipped inside index.html / this file.
+//
+// Uses Node's built-in https module (no global fetch(), no dependencies) so
+// this works on every Vercel Node.js runtime version.
 
-const DB_URL = "https://script-web-8d4a7-default-rtdb.asia-southeast1.firebasedatabase.app";
+const https = require('https');
 
+const DB_HOST = "script-web-8d4a7-default-rtdb.asia-southeast1.firebasedatabase.app";
+
+function fetchCode(id) {
+  return new Promise((resolve, reject) => {
+    const path = '/loaders/' + encodeURIComponent(id) + '/code.json';
+    const req = https.get({ host: DB_HOST, path, timeout: 8000 }, (res) => {
+      let body = '';
+      res.on('data', (c) => { body += c; });
+      res.on('end', () => {
+        try { resolve(JSON.parse(body)); }
+        catch (e) { resolve(null); }
+      });
+    });
+    req.on('timeout', () => { req.destroy(new Error('timeout')); });
+    req.on('error', reject);
+  });
+}
+
+// Real browser navigations carry Fetch-Metadata headers that are set by the
+// browser engine itself and are not something a simple HTTP client (which is
+// what every Roblox executor's HttpGet uses under the hood) normally sends.
+// This is a much stronger signal than User-Agent alone, which some executors
+// spoof to look like Chrome.
 function looksLikeBrowser(req) {
-  const ua = String(req.headers['user-agent'] || '');
-  const accept = String(req.headers['accept'] || '');
-  const fetchMode = String(req.headers['sec-fetch-mode'] || '');
-  // Real browsers send a Mozilla-style UA AND ask for text/html (or navigate).
-  // Executors' HttpGet calls almost never send both of these together.
+  const h = req.headers || {};
+  const dest = String(h['sec-fetch-dest'] || '').toLowerCase();
+  const mode = String(h['sec-fetch-mode'] || '').toLowerCase();
+  if (dest === 'document' || mode === 'navigate') return true;
+
+  // Fallback for the rare browser that strips Fetch-Metadata headers
+  // (some privacy-hardened browsers / older WebViews). Require ALL of:
+  // a Mozilla-style UA, an Accept header asking for HTML, AND an
+  // Accept-Language header -- real browsers always send all three,
+  // generic HTTP clients essentially never bother with all three at once.
+  const ua = String(h['user-agent'] || '');
+  const accept = String(h['accept'] || '');
   const hasBrowserUA = /mozilla/i.test(ua);
-  const wantsHtml = /text\/html/i.test(accept) || fetchMode === 'navigate';
-  return hasBrowserUA && wantsHtml;
+  const wantsHtml = /text\/html/i.test(accept);
+  const hasLang = !!h['accept-language'];
+  return hasBrowserUA && wantsHtml && hasLang;
 }
 
 function trollPage() {
@@ -75,7 +109,7 @@ function trollPage() {
 }
 
 module.exports = async (req, res) => {
-  const id = (req.query && req.query.id) || (req.url || '').split('/').filter(Boolean).pop();
+  const id = (req.query && req.query.id) || (req.url || '').split('?')[0].split('/').filter(Boolean).pop();
   if (!id || !/^[A-Za-z0-9_-]+$/.test(id)) {
     res.status(400).send('Bad loader id');
     return;
@@ -89,8 +123,7 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const r = await fetch(DB_URL + '/loaders/' + encodeURIComponent(id) + '/code.json');
-    const code = await r.json();
+    const code = await fetchCode(id);
     if (typeof code !== 'string' || !code) {
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
       res.status(404).send('-- loader not found or removed');
