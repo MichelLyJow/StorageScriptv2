@@ -8,8 +8,19 @@
 // The real code is fetched server-side from the Firebase Realtime Database,
 // so it is never shipped inside index.html / this file.
 //
-// Uses Node's built-in https module (no global fetch(), no dependencies) so
-// this works on every Vercel Node.js runtime version.
+// CORS is allowed from any origin: some mobile executors (Delta included)
+// run their HttpGet implementation through a WebView's fetch()/XHR, which
+// the browser engine blocks from reading a cross-origin response unless the
+// response carries Access-Control-Allow-Origin. Without this header the
+// request can succeed over the wire yet the executor still never sees the
+// body, which looks exactly like "the script just doesn't run".
+//
+// Add ?debug=1 to the URL to always get a plain-text dump of the headers
+// this function received and which branch it chose, instead of the normal
+// troll page / code response. Handy for figuring out what a specific
+// executor's HttpGet actually sends: run
+//   print(game:HttpGet("<your loader link>?debug=1"))
+// from the executor's console and read the output.
 
 const https = require('https');
 
@@ -36,23 +47,22 @@ function fetchCode(id) {
 // what every Roblox executor's HttpGet uses under the hood) normally sends.
 // This is a much stronger signal than User-Agent alone, which some executors
 // spoof to look like Chrome.
-function looksLikeBrowser(req) {
+function browserSignal(req) {
   const h = req.headers || {};
   const dest = String(h['sec-fetch-dest'] || '').toLowerCase();
   const mode = String(h['sec-fetch-mode'] || '').toLowerCase();
-  if (dest === 'document' || mode === 'navigate') return true;
+  if (dest === 'document' || mode === 'navigate') return 'fetch-metadata (dest=' + dest + ', mode=' + mode + ')';
 
-  // Fallback for the rare browser that strips Fetch-Metadata headers
-  // (some privacy-hardened browsers / older WebViews). Require ALL of:
-  // a Mozilla-style UA, an Accept header asking for HTML, AND an
-  // Accept-Language header -- real browsers always send all three,
-  // generic HTTP clients essentially never bother with all three at once.
+  // Fallback for the rare browser that strips Fetch-Metadata headers.
+  // Require a very specific, hard-to-fake Accept fingerprint that real
+  // Chrome/Firefox/Safari navigations send, not just "contains text/html".
   const ua = String(h['user-agent'] || '');
   const accept = String(h['accept'] || '');
   const hasBrowserUA = /mozilla/i.test(ua);
-  const wantsHtml = /text\/html/i.test(accept);
+  const acceptFingerprint = /text\/html/i.test(accept) && (/xhtml\+xml/i.test(accept) || /image\/webp/i.test(accept) || /image\/avif/i.test(accept));
   const hasLang = !!h['accept-language'];
-  return hasBrowserUA && wantsHtml && hasLang;
+  if (hasBrowserUA && acceptFingerprint && hasLang) return 'accept-fingerprint';
+  return null;
 }
 
 function trollPage() {
@@ -108,14 +118,43 @@ function trollPage() {
 </html>`;
 }
 
+function setCors(res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', '*');
+}
+
 module.exports = async (req, res) => {
+  setCors(res);
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
   const id = (req.query && req.query.id) || (req.url || '').split('?')[0].split('/').filter(Boolean).pop();
   if (!id || !/^[A-Za-z0-9_-]+$/.test(id)) {
     res.status(400).send('Bad loader id');
     return;
   }
 
-  if (looksLikeBrowser(req)) {
+  const debug = req.query && (req.query.debug === '1' || req.query.debug === 'true');
+  const signal = browserSignal(req);
+
+  if (debug) {
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-store');
+    const lines = Object.entries(req.headers || {}).map(([k, v]) => '  ' + k + ': ' + v);
+    res.status(200).send(
+      '-- MScript loader debug\n' +
+      '-- decision: ' + (signal ? ('BROWSER (' + signal + ')') : 'EXECUTOR (raw code)') + '\n' +
+      '-- method: ' + req.method + '\n' +
+      '-- headers received:\n' + lines.join('\n') + '\n'
+    );
+    return;
+  }
+
+  if (signal) {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'no-store');
     res.status(200).send(trollPage());
