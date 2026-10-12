@@ -1,6 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/loaders/:id", "destination": "/api/loaders/:id" },
-    { "source": "/((?!api/|loaders/).*)", "destination": "/index.html" }
-  ]
-}
