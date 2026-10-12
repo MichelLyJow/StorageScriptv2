@@ -243,4 +243,3 @@ module.exports = async (req, res) => {
     res.status(502).send('-- failed to load script, try again');
   }
 };
-  
