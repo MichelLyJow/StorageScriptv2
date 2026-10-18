@@ -69,7 +69,7 @@ function trollPage() {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>MScript Loader</title>
+<title>Cortex Site Loader</title>
 <style>
   :root{ color-scheme: dark; }
   *{ box-sizing:border-box; }
@@ -179,7 +179,7 @@ function trollPage() {
       <div class="pill"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M8 2v4M16 2v4M3.5 10h17"/></svg>Browser view blocked</div>
       <div class="pill"><svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg>Executor-only content</div>
     </div>
-    <div class="brand">Protected by MScript</div>
+    <div class="brand">Protected by Cortex Site</div>
   </div>
 </body>
 </html>`;
@@ -213,7 +213,7 @@ module.exports = async (req, res) => {
     res.setHeader('Cache-Control', 'no-store');
     const lines = Object.entries(req.headers || {}).map(([k, v]) => '  ' + k + ': ' + v);
     res.status(200).send(
-      '-- MScript loader debug\n' +
+      '-- Cortex Site loader debug\n' +
       '-- decision: ' + (signal ? ('BROWSER (' + signal + ')') : 'EXECUTOR (raw code)') + '\n' +
       '-- method: ' + req.method + '\n' +
       '-- headers received:\n' + lines.join('\n') + '\n'
