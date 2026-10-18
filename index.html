@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta name="theme-color" content="#000000">
+<link rel="icon" href="/logo.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Cortex Site</title>
+<link rel="stylesheet" href="/style.css">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bungee&family=Righteous&family=Orbitron:wght@700&family=Permanent+Marker&family=Press+Start+2P&family=Audiowide&display=swap">
+</head>
+<body>
+<header>
+  <div class="brand"><img class="logoImg" src="/logo.png" alt="Cortex Site logo">Cortex Site</div>
+  <div class="headerRight">
+    <button class="circBtn" onclick="go('inbox')" aria-label="Inbox"><svg viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7"/><path d="M10 20a2 2 0 0 0 4 0"/></svg></button>
+    <button class="circBtn" onclick="openMenu()" aria-label="Menu"><svg viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+  </div>
+</header>
+
+<main>
+
+  <!-- BERANDA / FEED -->
+  <section class="page active" id="page-beranda">
+    <div class="searchRow" id="searchRowPosts">
+      <svg class="sIcon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="searchInput" placeholder="Search scripts..." oninput="renderFeed()">
+      <button class="searchBtn" onclick="renderFeed()">Search</button>
+    </div>
+    <div class="searchRow" id="searchRowUsers" style="display:none;">
+      <svg class="sIcon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="userSearchInput" placeholder="Search username..." oninput="renderFeed()">
+      <button class="searchBtn" onclick="renderFeed()">Search</button>
+    </div>
+    <div class="statsRow">
+      <span><b id="statScripts">0</b> scripts</span>
+      <span><b id="statUsers">0</b> users</span>
+      <span class="onlineStat" id="onlineStat" style="display:none;"><i class="dot"></i><b id="statOnline">0</b> online</span>
+    </div>
+    <div class="communityRow">
+      <a class="commBtn wa" href="https://whatsapp.com/channel/0029VbDPTIi9cDDRLb6Ukj3I" target="_blank" rel="noopener" data-link="whatsapp"><svg viewBox="0 0 24 24"><path d="M3 21l1.6-4.6A8.5 8.5 0 1 1 8 19.6z"/><path d="M9 8.8c0 3 3 6 6.2 6.2l1.1-1.4-2-1.2-.9.8c-1-.4-2-1.3-2.4-2.4l.8-.9-1.2-2z"/></svg>WhatsApp</a>
+      <a class="commBtn dc" href="https://discord.gg/6B36mdd6cJ" target="_blank" rel="noopener" data-link="discord"><svg viewBox="0 0 24 24"><path d="M7.5 6.5C9 5.8 10.4 5.5 12 5.5s3 .3 4.5 1c1.7 2.5 2.5 5.2 2.8 8.3-1.3 1-2.7 1.6-4.2 2l-1-1.6M7.5 6.5C5.8 9 5 11.7 4.7 14.8c1.3 1 2.7 1.6 4.2 2l1-1.6"/><circle cx="9.6" cy="12" r="1.1"/><circle cx="14.4" cy="12" r="1.1"/></svg>Discord</a>
+      <button class="commBtn gc" onclick="go('gchat')"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9.5L4 20z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Global Chat</button>
+    </div>
+    <div class="feedHead">
+      <h2 id="feedHeading">Latest Scripts</h2>
+      <div class="sortWrap" id="sortWrap">
+        <button class="sortBtn" onclick="toggleSortMenu(event)">
+          <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+          <span id="sortLabel">Recommended</span>
+          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="sortMenu" id="sortMenu">
+          <button data-sort="rec" class="active" onclick="setSort('rec')">Recommended</button>
+          <button data-sort="new" onclick="setSort('new')">Newest</button>
+          <button data-sort="top" onclick="setSort('top')">Popular</button>
+        </div>
+      </div>
+    </div>
+    <div class="tabs" id="filterTabs">
+      <button class="tab active" onclick="setFilter('all',this)">All</button>
+      <button class="tab" onclick="setFilter('nokey',this)"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l3 3"/></svg>No keysystem</button>
+      <button class="tab" onclick="setFilter('verified',this)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></svg>Verified only</button>
+      <button class="tab" onclick="setFilter('games',this)"><svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="11" rx="4"/><path d="M8 10v5M5.5 12.5h5M15.5 11h.01M18 14h.01"/></svg>Games</button>
+    </div>
+    <div id="feedList"></div>
+  </section>
+
+  <!-- DETAIL POST -->
+  <section class="page" id="page-detail">
+    <div class="detailBar">
+      <button class="circBtn" onclick="go('beranda')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="detailBarTitle">Script</div>
+      <div class="detailBarRight">
+        <button class="circBtn" id="saveBtn" onclick="toggleSave()" aria-label="Save"><svg viewBox="0 0 24 24"><path d="M6 4h12v17l-6-4-6 4z"/></svg></button>
+        <button class="circBtn" onclick="sharePost()" aria-label="Share"><svg viewBox="0 0 24 24"><path d="M14 5l6 6-6 6"/><path d="M20 11H9a5 5 0 0 0-5 5v3"/></svg></button>
+      </div>
+    </div>
+
+    <div class="dCard dHero">
+      <div class="detailThumb" id="detailThumb"></div>
+      <div class="dHeroBody">
+        <div class="dAuthor">
+          <div class="authorRow" style="cursor:pointer;" onclick="openUserProfile(currentDetailAuthorUid)"><div class="miniAvatar big" id="detailAvatar"></div><span id="detailAuthor"></span></div>
+          <button class="followPill" id="detailFollowBtn" onclick="toggleFollowAuthor()">+ Follow</button>
+        </div>
+        <h1 class="detailTitle" id="detailTitle"></h1>
+        <div class="gameLink" id="detailGame" style="display:none;"></div>
+        <button class="copyMain" onclick="copyMain()"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copy</button>
+        <div class="pillRow">
+          <button class="pillBtn" id="likeBtn" onclick="toggleLike()"></button>
+          <span class="pillStat" id="detailViews"></span>
+          <span class="pillStat" id="detailSlotsStat"></span>
+          <span class="pillStat" id="detailTime"></span>
+        </div>
+        <div class="linkRow" id="detailLinks"></div>
+        <div class="dDivider" id="tagsDivider"></div>
+        <div class="chipRow" id="detailTags"></div>
+        <div class="rowbtns" id="ownerActions" style="display:none; margin-top:14px;">
+          <button class="btn" id="devLikesBtn" style="display:none;" onclick="openLikesModal()">Set likes</button>
+          <button class="btn" id="devViewsBtn" style="display:none;" onclick="openViewsModal()">Set views</button>
+          <button class="btn" onclick="startEditPost()">Edit Script</button>
+          <button class="btn ghost" style="color:#ff6b6b; border-color:#4a2326;" onclick="deletePost()">Delete Script</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="dCard">
+      <div class="dLabel">Description</div>
+      <div class="dDesc collapsed" id="detailDesc"></div>
+      <button class="showMore" id="descMore" onclick="toggleDesc()">Show more <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+    </div>
+
+    <div class="dCard" id="featuresCard" style="display:none;">
+      <div class="dLabel">Features</div>
+      <ul class="featList" id="detailFeatures"></ul>
+    </div>
+
+    <div class="dCard">
+      <div class="dLabelRow"><span class="dLabel">Comments</span><span class="dCount" id="commentCount">0</span></div>
+      <div class="compose">
+        <div class="miniAvatar big" id="composeAvatar">?</div>
+        <div class="composeBox"><textarea id="commentInput" maxlength="500" placeholder="Add a comment..." oninput="updateCommentChars()"></textarea></div>
+      </div>
+      <div class="composeFoot"><span id="commentChars">0/500</span><button class="postBtn" onclick="submitComment()">Post</button></div>
+      <div id="commentList"></div>
+    </div>
+
+    <div id="detailSlots"></div>
+  </section>
+
+  <!-- INBOX -->
+  <section class="page" id="page-inbox">
+    <div class="pageHead"><div><h1>Inbox</h1><p>Your conversations and feedback.</p></div></div>
+
+    <div class="section-title">Messages</div>
+    <div id="dmConvoList"><div class="empty" id="inboxEmpty">No messages yet.</div></div>
+
+    <div class="section-title">Send Feedback</div>
+    <textarea id="feedbackInput" rows="3" maxlength="500" placeholder="Got feedback or suggestions about this app?"></textarea>
+    <div class="hint" id="feedbackQuota"></div>
+    <button class="btn primary" id="feedbackBtn" style="width:100%; margin-top:10px;" onclick="submitFeedback()">Send Feedback</button>
+  </section>
+
+  <!-- GAME PAGE -->
+  <section class="page" id="page-game">
+    <div class="detailHeader tri">
+      <button class="circBtn" onclick="gameBack()" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="htitle" id="gameBarTitle"></div>
+      <button class="circBtn" onclick="shareGame()" aria-label="Share game"><svg viewBox="0 0 24 24"><path d="M14 5l6 6-6 6"/><path d="M20 11H9a5 5 0 0 0-5 5v3"/></svg></button>
+    </div>
+    <div class="gameHero">
+      <div class="ghBg" id="ghBg"></div>
+      <div class="ghShade"></div>
+      <div class="ghRow">
+        <div class="ghIcon" id="ghIcon"></div>
+        <div class="ghText">
+          <h1 id="ghName"></h1>
+          <p>Discover scripts for this Roblox experience</p>
+          <span id="ghCount"></span>
+        </div>
+      </div>
+    </div>
+    <a class="playBtn" id="gamePlayBtn" href="#" target="_blank" rel="noopener" style="display:none;">
+      <svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M8 10.5v4M6 12.5h4M15.5 11.5h.01M18 13.5h.01"/></svg>Play on Roblox
+    </a>
+    <div class="searchRow" style="margin-top:18px;">
+      <svg class="sIcon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="gameSearchInput" placeholder="Search scripts..." autocomplete="off" oninput="renderGamePage()">
+      <button class="searchBtn" onclick="renderGamePage()">Search</button>
+    </div>
+    <div class="feedHead">
+      <h2>Scripts</h2>
+      <div class="sortWrap">
+        <button class="sortBtn" onclick="toggleGameSort(event)">
+          <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+          <span id="gameSortLabel">Top liked</span>
+          <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="sortMenu" id="gameSortMenu">
+          <button data-sort="top" class="active" onclick="setGameSort('top')">Top liked</button>
+          <button data-sort="new" onclick="setGameSort('new')">Newest</button>
+          <button data-sort="views" onclick="setGameSort('views')">Most viewed</button>
+        </div>
+      </div>
+    </div>
+    <div id="gameFeedList"></div>
+  </section>
+
+  <!-- DEVELOPER PANEL -->
+  <section class="page" id="page-dev">
+    <div class="detailHeader tri">
+      <button class="circBtn" onclick="go('beranda')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="htitle">Developer</div>
+      <span style="width:48px; flex-shrink:0;"></span>
+    </div>
+
+    <div class="devStats">
+      <div class="devStat"><b id="dsScripts">0</b><span>Scripts</span></div>
+      <div class="devStat"><b id="dsUsers">0</b><span>Users</span></div>
+      <div class="devStat"><b id="dsUnread">0</b><span>Unread feedback</span></div>
+    </div>
+
+    <div class="section-title">Users</div>
+    <div class="searchRow" style="margin-bottom:12px;">
+      <svg class="sIcon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="devUserSearch" placeholder="Search username..." autocomplete="off" oninput="renderDevUsers()">
+    </div>
+    <div id="devUserList"></div>
+
+    <div class="section-title">Display numbers</div>
+    <label class="field">Users count shown on the home page</label>
+    <div class="umRow">
+      <input id="devUsersCountInput" inputmode="numeric" autocomplete="off">
+      <button class="btn primary" onclick="saveUsersCount()">Save</button>
+      <button class="btn" onclick="resetUsersCount()">Auto</button>
+    </div>
+    <div class="hint" id="devUsersCountHint"></div>
+    <p class="hint">Followers are set per user (Users → tap a user). Likes are set on each script page.</p>
+
+    <div class="section-title">Incoming Feedback</div>
+    <p class="hint" style="margin-top:0;">Tap a username to read the feedback. Opening it marks it as read. Unread feedback is deleted automatically after 24 hours.</p>
+    <button class="btn" style="width:100%; margin-bottom:12px;" onclick="markAllFeedbackRead()">Mark all as read</button>
+    <div id="devFeedbackList"></div>
+
+    <div class="section-title">Community Links</div>
+    <label class="field">WhatsApp link</label>
+    <input id="devWaInput" autocomplete="off" inputmode="url">
+    <label class="field">Discord link</label>
+    <input id="devDcInput" autocomplete="off" inputmode="url">
+    <button class="btn primary" style="width:100%; margin-top:10px;" onclick="saveCommunityLinks()">Save Links</button>
+
+    <div class="section-title">Gemini API Key</div>
+    <p class="hint" style="margin-top:0;">If the API key runs out of quota or expires, replace it here without re-uploading the file.</p>
+    <input id="devApiKeyInput" placeholder="Paste new Gemini API key">
+    <button class="btn primary" style="width:100%; margin-top:10px;" onclick="saveGeminiApiKey()">Save API Key</button>
+  </section>
+
+  <!-- SCRIPT LOADER (obfuscator) -->
+  <section class="page" id="page-loader">
+    <div class="detailHeader">
+      <button class="circBtn" onclick="go('beranda')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="htitle">Script Loader</div>
+    </div>
+    <label class="field">Script name</label>
+    <input id="ldName" maxlength="60" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off" oninput="updateLdSlugPreview()">
+    <div class="hint" id="ldSlugHint">Used in the link: your-site.vercel.app/loaders/your-name</div>
+
+    <label class="field" style="margin-top:22px;">Your script</label>
+    <textarea id="ldCode" rows="10" placeholder="" autocapitalize="off" autocorrect="off" spellcheck="false" autocomplete="off"></textarea>
+    <div class="hint" id="ldCount">0 characters</div>
+
+    <button class="btn primary" style="width:100%; margin-top:16px;" onclick="generateLoader()"><span id="ldBtnLabel">Generate protected link</span></button>
+
+    <div class="section-title" style="margin-top:34px;">Your loaders</div>
+    <div id="ldList"></div>
+
+    <div id="ldResult" style="display:none; margin-top:22px;">
+      <div class="dCard">
+        <div class="dLabel">Put this in your script</div>
+        <pre class="codeBlock" id="ldSnippet" style="margin-top:14px;"></pre>
+        <div class="scriptActions"><button class="copyPill" onclick="copyLoaderSnippet()">Copy</button></div>
+      </div>
+      <div class="dCard">
+        <div class="dLabel">Loader link</div>
+        <div class="hint" style="margin:12px 0 0; word-break:break-all;" id="ldLink"></div>
+        <div class="scriptActions">
+          <a class="copyPill" id="ldPreview" href="#" target="_blank" rel="noopener" style="text-decoration:none; text-align:center;">Preview</a>
+          <button class="copyPill" onclick="copyLoaderLink()">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UPLOAD -->
+  <section class="page" id="page-upload">
+    <div class="detailHeader tri">
+      <button class="circBtn" onclick="go('beranda')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="htitle" id="uploadHeading">Publish script</div>
+      <button class="circBtn" onclick="resetUploadForm()" aria-label="Reset form"><svg viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="12" cy="5" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="12" cy="19" r="1.8"/></svg></button>
+    </div>
+
+    <label class="field">Script type</label>
+    <div class="seg big" id="scopeSeg">
+      <button type="button" class="active" data-scope="game" onclick="setScope('game')">Specific game</button>
+      <button type="button" data-scope="universal" onclick="setScope('universal')">Universal</button>
+    </div>
+
+    <div id="gameField">
+      <label class="field">Game</label>
+      <button type="button" class="gameCardBtn" id="upGameBtn" onclick="openGamePicker()">
+        <span class="gcbIcon" id="upGameIcon"><svg viewBox="0 0 24 24"><rect x="2.5" y="7" width="19" height="11" rx="5"/><path d="M8 10.5v4M6 12.5h4M15.5 11.5h.01M18 13.5h.01"/></svg></span>
+        <span class="gcbText"><b id="upGameLabel">Choose a game</b><i id="upGameSub">Search by name or paste a Roblox link</i></span>
+        <span class="gcbPen"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></span>
+      </button>
+    </div>
+
+    <div class="labelRow"><label class="field">Title</label><span class="counter" id="titleCount">0/60</span></div>
+    <input id="upTitle" maxlength="60" autocomplete="off" oninput="updateCounters()">
+    <div class="hint">Do not include the game name in the title.</div>
+
+    <label class="field">Script code</label>
+    <button type="button" class="codeRowBtn" onclick="openCodeEditor()">
+      <span class="crIcon"><svg viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></span><span class="crText" id="codeSummary">Add your script code</span><span class="gcbPen"><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg></span>
+    </button>
+
+    <div class="labelRow"><label class="field">Description</label><span class="counter" id="descCount">0/10000</span></div>
+    <textarea id="upDesc" rows="5" maxlength="10000" oninput="updateCounters()"></textarea>
+    <div class="hint">At least 30 characters.</div>
+
+    <label class="field">Thumbnail</label>
+    <div class="thumbUpload big" id="thumbUploadBox" onclick="document.getElementById('thumbFile').click()">
+      <span class="thumbIc" id="thumbIcon"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="17" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-5 4 4 3-3 4 4"/></svg></span>
+      <b id="thumbLabel">Add a thumbnail</b>
+      <i id="thumbSub">16:9 works best, up to 5MB</i>
+    </div>
+    <input type="file" id="thumbFile" accept="image/*" style="display:none" onchange="pickThumb(event)">
+    <div class="hint" id="thumbHint" style="display:none;">A thumbnail is required for universal scripts.</div>
+
+    <button type="button" class="moreBtn" id="moreBtn" onclick="toggleMore()"><span>More options</span><svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></button>
+    <div id="moreBox" style="display:none;">
+      <div class="labelRow"><label class="field">Tags</label><span class="counter" id="tagCount">0/10</span></div>
+      <div class="chipBox"><div class="chipList" id="tagChips"></div><input id="tagInput" maxlength="30" autocomplete="off" onkeydown="chipKey(event,'tag')" onblur="chipCommit('tag')"></div>
+      <div class="hint">Type a tag and press Enter. Help people find your script.</div>
+
+      <div class="labelRow"><label class="field">Features</label><span class="counter" id="featCount">0/30</span></div>
+      <div class="chipBox"><div class="chipList" id="featChips"></div><input id="featInput" maxlength="80" autocomplete="off" onkeydown="chipKey(event,'feat')" onblur="chipCommit('feat')"></div>
+      <div class="hint">Type a feature and press Enter. Shown as a list on the script page.</div>
+
+      <div class="optCard" onclick="toggleOpt('key')">
+        <span class="optIcon"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8M16 7l3 3"/></svg></span>
+        <span class="optText"><b>Key system</b><i>Users need a key to run the script</i></span>
+        <span class="tgl" id="tglKey"></span>
+      </div>
+
+      <label class="field">Discord invite (optional)</label>
+      <input id="upDiscord" autocomplete="off" inputmode="url">
+      <label class="field">YouTube video (optional)</label>
+      <input id="upYoutube" autocomplete="off" inputmode="url">
+
+      <label class="field">Visibility</label>
+      <div class="seg big" id="visSeg">
+        <button type="button" class="active" data-vis="public" onclick="setVis('public')">Public</button>
+        <button type="button" data-vis="unlisted" onclick="setVis('unlisted')">Unlisted</button>
+        <button type="button" data-vis="private" onclick="setVis('private')">Private</button>
+      </div>
+      <div class="hint" id="visHint">Everyone can find this script in the feed.</div>
+    </div>
+
+    <div class="uploadBar">
+      <button class="publishBtn" onclick="publishScript()"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg><span id="publishBtnLabel">Publish script</span></button>
+    </div>
+  </section>
+
+  <!-- GLOBAL CHAT -->
+  <section class="page" id="page-gchat">
+    <div class="detailHeader">
+      <button class="circBtn" onclick="go('beranda')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="htitle">Global Chat</div>
+    </div>
+    <div id="gcList"></div>
+    <div class="aiInputBar">
+      <div class="commentInputRow">
+        <input id="gcInput" maxlength="300" autocomplete="off" placeholder="Message everyone..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); sendGlobalMessage(); }">
+        <button class="sendBtn round" onclick="sendGlobalMessage()" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- AI ASSISTANT -->
+  <section class="page" id="page-ai">
+    <div class="pageHead">
+      <div><h1>AI Assistant</h1><p>Ask about Roblox Lua scripts — writing, fixing bugs, or explaining code.</p></div>
+      <button class="circBtn" onclick="clearAiHistory()" aria-label="Clear history"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>
+    </div>
+    <div id="aiChatList" style="min-height:120px; margin:6px 0 110px;"></div>
+    <div class="aiInputBar">
+      <div class="commentInputRow">
+        <input id="aiInput" placeholder="Type a question..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); sendAiMessage(); }">
+        <button class="sendBtn round" onclick="sendAiMessage()" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROFIL -->
+  <section class="page" id="page-profil">
+    <div class="profileCard" id="profileView">
+      <div class="profileBanner empty" id="viewBanner"></div>
+      <div class="profileTop">
+        <div class="avatar" id="avatarInitial">?</div>
+        <div style="flex:1;">
+          <p class="pname" id="viewName">Guest</p>
+          <p class="puser" id="viewUser">@guest</p>
+        </div>
+      </div>
+      <p class="bio" id="viewBio">No bio yet.</p>
+      <div class="socialRow" id="viewSocials"></div>
+      <div class="stats">
+        <div class="stat"><b id="statPosts">0</b><span>Posts</span></div>
+        <div class="stat"><b id="statFollowing">0</b><span>Following</span></div>
+        <div class="stat"><b id="statFollowers">0</b><span>Followers</span></div>
+        <div class="stat"><b id="statLikes">0</b><span>Like</span></div>
+      </div>
+      <div class="rowbtns" id="loggedOutRow">
+        <button class="btn primary" onclick="openAuth('login')">Log In</button>
+        <button class="btn ghost" onclick="openAuth('register')">Sign Up</button>
+      </div>
+      <div class="rowbtns" id="loggedInRow" style="display:none;">
+        <button class="btn" onclick="editProfile()">Edit Profile</button>
+        <button class="btn ghost" onclick="switchAccount()">Switch Account</button>
+        <button class="btn ghost" onclick="logout()">Log Out</button>
+      </div>
+    </div>
+
+    <div class="profileCard" id="profileEdit" style="display:none; margin-top:0;">
+      <div class="profileBanner empty" id="editBanner" onclick="document.getElementById('bannerFile').click()" style="cursor:pointer;">
+        <button type="button" class="bannerEditBtn" aria-label="Change banner"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></button>
+      </div>
+      <input type="file" id="bannerFile" accept="image/*" style="display:none" onchange="pickBanner(event)">
+      <div class="profileTop">
+        <div class="avatar" id="editAvatarInitial" data-ring="blue" onclick="document.getElementById('avatarFile').click()" style="cursor:pointer; position:relative;">?</div>
+        <input type="file" id="avatarFile" accept="image/*" style="display:none" onchange="pickAvatar(event)">
+        <input id="editName" style="font-weight:800; color:var(--gold); flex:1;" placeholder="Name">
+      </div>
+      <div class="hint" style="margin-left:92px; margin-top:-10px;">Tap the photo to change your profile picture, tap the banner above to change it.</div>
+      <p class="puser" id="editUserLabel">@guest</p>
+      <textarea id="editBio" rows="3" placeholder="Write a short bio about yourself..." style="margin-top:14px;"></textarea>
+
+      <label class="field">Avatar ring</label>
+      <div class="ringPicker" id="ringPicker">
+        <div class="ringSwatch" data-ring="none" onclick="setRingStyle('none')"></div>
+        <div class="ringSwatch" data-ring="blue" onclick="setRingStyle('blue')"></div>
+        <div class="ringSwatch" data-ring="purple" onclick="setRingStyle('purple')"></div>
+        <div class="ringSwatch" data-ring="rainbow" onclick="setRingStyle('rainbow')"></div>
+        <div class="ringSwatch" data-ring="green" onclick="setRingStyle('green')"></div>
+        <div class="ringSwatch" data-ring="gold" onclick="setRingStyle('gold')"></div>
+      </div>
+
+      <label class="field">Username font</label>
+      <div class="fontPicker" id="fontPicker">
+        <div class="fontSwatch" data-font="default" onclick="setNameFont('default')">Aa</div>
+        <div class="fontSwatch" data-font="bungee" onclick="setNameFont('bungee')">Aa</div>
+        <div class="fontSwatch" data-font="righteous" onclick="setNameFont('righteous')">Aa</div>
+        <div class="fontSwatch" data-font="orbitron" onclick="setNameFont('orbitron')">Aa</div>
+        <div class="fontSwatch" data-font="marker" onclick="setNameFont('marker')">Aa</div>
+        <div class="fontSwatch" data-font="pixel" onclick="setNameFont('pixel')">Aa</div>
+        <div class="fontSwatch" data-font="audiowide" onclick="setNameFont('audiowide')">Aa</div>
+      </div>
+
+      <label class="field">Website (optional)</label>
+      <input id="editWebsite" placeholder="https://...">
+      <label class="field">Discord invite (optional)</label>
+      <input id="editDiscord" placeholder="https://discord.gg/...">
+      <label class="field">X / Twitter (optional)</label>
+      <input id="editX" placeholder="@ username">
+      <label class="field">TikTok (optional)</label>
+      <input id="editTiktok" placeholder="@ username">
+      <label class="field">YouTube (optional)</label>
+      <input id="editYoutube" placeholder="@ username">
+      <div class="rowbtns" style="margin-top:20px;">
+        <button class="btn primary" onclick="saveProfile()">Save Profile</button>
+        <button class="btn ghost" onclick="cancelEdit()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="section-title">Your Posts</div>
+    <div id="myPosts"><div class="empty">No scripts uploaded yet.</div></div>
+  </section>
+
+  <!-- USER PROFILE (public, read-only) -->
+  <section class="page" id="page-userprofile">
+    <div class="detailHeader">
+      <button class="circBtn" onclick="go('beranda')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="htitle">Profile</div>
+    </div>
+    <div class="profileCard">
+      <div class="profileBanner empty" id="uBanner"></div>
+      <div class="profileTop">
+        <div class="avatar" id="uAvatar">?</div>
+        <div style="flex:1;">
+          <p class="pname" id="uName">-</p>
+          <p class="puser" id="uUser">@-</p>
+        </div>
+      </div>
+      <p class="bio" id="uBio">No bio yet.</p>
+      <div class="socialRow" id="uSocials"></div>
+      <div class="stats">
+        <div class="stat"><b id="uStatPosts">0</b><span>Posts</span></div>
+        <div class="stat"><b id="uStatFollowing">0</b><span>Following</span></div>
+        <div class="stat"><b id="uStatFollowers">0</b><span>Followers</span></div>
+      </div>
+      <div class="rowbtns">
+        <button class="btn primary" id="followBtn" onclick="toggleFollow()">Follow</button>
+        <button class="btn" onclick="openDmChat(viewingUid)">Chat</button>
+      </div>
+    </div>
+    <div class="section-title">Posts</div>
+    <div id="uPosts"><div class="empty">No scripts uploaded yet.</div></div>
+  </section>
+
+  <!-- DIRECT MESSAGE -->
+  <section class="page" id="page-dm">
+    <div class="detailHeader">
+      <button class="circBtn" onclick="go('inbox')" aria-label="Back"><svg viewBox="0 0 24 24"><path d="m15 5-7 7 7 7"/></svg></button>
+      <div class="htitle" id="dmTitle">Messages</div>
+    </div>
+    <div id="dmChatList" style="min-height:120px; margin:14px 0 90px; padding:2px;"></div>
+    <div class="aiInputBar">
+      <div class="commentInputRow">
+        <input id="dmInput" placeholder="Type a message..." onkeydown="if(event.key==='Enter'){ event.preventDefault(); sendDmMessage(); }">
+        <button class="sendBtn round" onclick="sendDmMessage()" aria-label="Send"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav>
+  <div class="navPill">
+    <button class="navItem active" id="nav-beranda" aria-label="Home" onclick="go('beranda')">
+      <svg viewBox="0 0 24 24"><path d="M8 7 3 12l5 5"/><path d="m16 7 5 5-5 5"/><path d="m14 4-4 16"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="navItem" id="nav-inbox" aria-label="Inbox" onclick="go('inbox')">
+      <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>
+      <span>Inbox</span>
+    </button>
+    <button class="navItem" id="nav-ai" aria-label="AI" onclick="go('ai')">
+      <svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>
+      <span>AI</span>
+    </button>
+    <button class="navItem" id="nav-profil" aria-label="Profile" onclick="go('profil')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.8 4-5.5 7-5.5s5.8 1.7 7 5.5"/></svg>
+      <span>Profile</span>
+    </button>
+  </div>
+  <button class="fab" aria-label="Upload" onclick="openUploadFresh()">+</button>
+</nav>
+
+<!-- AUTH MODAL -->
+<div class="overlay" id="authOverlay">
+  <div class="modal">
+    <button class="modalClose" onclick="closeAuth()">✕</button>
+    <div class="modalEyebrow" id="authEyebrow">LOG IN TO</div>
+    <div class="modalTitle">Cortex Site</div>
+    <label class="field">Username</label>
+    <input id="authUser">
+    <label class="field">Password</label>
+    <input id="authPass" type="password" placeholder="At least 6 characters">
+    <button class="btn primary" style="width:100%; margin-top:22px;" id="authSubmit" onclick="submitAuth()">Log In</button>
+    <div class="switchLine" id="authSwitchLine">Don't have an account? <a onclick="switchAuthMode()">Sign up here</a></div>
+  </div>
+</div>
+
+<!-- CODE EDITOR -->
+<div class="overlay" id="codeEditor">
+  <div class="modal fullSheet">
+    <div class="sheetBar"><div class="sheetTitle">Script code</div><button class="sheetDone" onclick="closeCodeEditor()">Done</button></div>
+    <div class="sheetBody">
+      <div id="slotsWrap"></div>
+      <button class="addSlot" onclick="addSlot()">+ Add Slot</button>
+    </div>
+  </div>
+</div>
+
+<!-- GAME PICKER (Roblox search) -->
+<div class="overlay" id="gamePicker">
+  <div class="modal fullSheet">
+    <div class="sheetBar"><div class="sheetTitle">Choose a game</div><button class="sheetX" onclick="closeGamePicker()" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="searchRow pickSearch">
+      <input id="gamePickerSearch" placeholder="Search games or paste a Roblox link" autocomplete="off" oninput="onGameSearchInput()">
+    </div>
+    <div class="sheetBody" id="gamePickerList"></div>
+  </div>
+</div>
+
+<!-- USER MANAGE (developer) -->
+<div class="overlay" id="userManage" onclick="if(event.target===this)closeUserManage()">
+  <div class="modal umModal">
+    <button class="modalClose" onclick="closeUserManage()">✕</button>
+    <div class="umHead">
+      <div class="miniAvatar big" id="umAvatar"></div>
+      <div class="umWho"><b id="umName"></b><span id="umStatus"></span></div>
+    </div>
+
+    <label class="field">Followers</label>
+    <div class="umRow">
+      <input id="umFollowers" inputmode="numeric" autocomplete="off">
+      <button class="btn primary" onclick="saveUserFollowers()">Save</button>
+      <button class="btn" onclick="resetUserFollowers()">Auto</button>
+    </div>
+    <div class="hint" id="umFollowersHint"></div>
+
+    <label class="field">Ban</label>
+    <div class="umRow">
+      <input id="umBanNum" inputmode="numeric" value="1" autocomplete="off">
+      <select id="umBanUnit">
+        <option value="minutes">Minutes</option>
+        <option value="hours" selected>Hours</option>
+        <option value="days">Days</option>
+        <option value="forever">Permanent</option>
+      </select>
+    </div>
+    <div class="umRow" style="margin-top:10px;">
+      <button class="btn primary" onclick="banSelectedUser()">Ban user</button>
+      <button class="btn" id="umUnban" onclick="unbanSelectedUser()">Unban</button>
+    </div>
+
+    <button class="btn danger" style="width:100%; margin-top:22px;" onclick="deleteSelectedAccount()">Delete account</button>
+  </div>
+</div>
+
+<!-- SET LIKES (developer) -->
+<div class="overlay" id="likesModal" onclick="if(event.target===this)closeLikesModal()">
+  <div class="modal">
+    <button class="modalClose" onclick="closeLikesModal()">✕</button>
+    <div class="modalTitle" style="text-align:left;">Set likes</div>
+    <div class="hint" id="likesHint"></div>
+    <input id="likesInput" inputmode="numeric" autocomplete="off" style="margin-top:12px;">
+    <div class="umRow" style="margin-top:18px;">
+      <button class="btn primary" onclick="saveLikes()">Save</button>
+      <button class="btn" onclick="resetLikes()">Auto</button>
+    </div>
+  </div>
+</div>
+
+<!-- SET VIEWS (developer) -->
+<div class="overlay" id="viewsModal" onclick="if(event.target===this)closeViewsModal()">
+  <div class="modal">
+    <button class="modalClose" onclick="closeViewsModal()">✕</button>
+    <div class="modalTitle" style="text-align:left;">Set views</div>
+    <div class="hint" id="viewsHint"></div>
+    <input id="viewsInput" inputmode="numeric" autocomplete="off" style="margin-top:12px;">
+    <div class="umRow" style="margin-top:18px;">
+      <button class="btn primary" onclick="saveViews()">Save</button>
+      <button class="btn" onclick="resetViews()">Auto</button>
+    </div>
+  </div>
+</div>
+
+<!-- BAN SCREEN -->
+<div class="overlay" id="banOverlay">
+  <div class="banCard">
+    <div class="banIcon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/></svg></div>
+    <h2 id="banTitle">Your account is banned</h2>
+    <p id="banMsg">You can log in again when the timer ends.</p>
+    <div class="banTimer" id="banTimer">--</div>
+    <button class="btn primary" style="width:100%;" onclick="closeBan()">OK</button>
+  </div>
+</div>
+
+<!-- MENU SHEET -->
+<div class="overlay" id="menuOverlay" onclick="if(event.target===this)closeMenu()">
+  <div class="modal menuSheet">
+    <button class="menuItem" onclick="menuGo('profil')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.2-3.8 4-5.5 7-5.5s5.8 1.7 7 5.5"/></svg>My Profile</button>
+    <button class="menuItem" onclick="menuGo('inbox')"><svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>Inbox &amp; Feedback</button>
+    <button class="menuItem" onclick="menuGo('ai')"><svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/></svg>AI Assistant</button>
+    <button class="menuItem" onclick="menuGo('gchat')"><svg viewBox="0 0 24 24"><path d="M4 5h16v11H9.5L4 20z"/><path d="M8 9.5h8M8 12.5h5"/></svg>Global Chat</button>
+    <a class="menuItem" href="https://whatsapp.com/channel/0029VbDPTIi9cDDRLb6Ukj3I" target="_blank" rel="noopener" data-link="whatsapp" onclick="closeMenu()"><svg viewBox="0 0 24 24"><path d="M3 21l1.6-4.6A8.5 8.5 0 1 1 8 19.6z"/><path d="M9 8.8c0 3 3 6 6.2 6.2l1.1-1.4-2-1.2-.9.8c-1-.4-2-1.3-2.4-2.4l.8-.9-1.2-2z"/></svg>WhatsApp Channel</a>
+    <a class="menuItem" href="https://discord.gg/6B36mdd6cJ" target="_blank" rel="noopener" data-link="discord" onclick="closeMenu()"><svg viewBox="0 0 24 24"><path d="M7.5 6.5C9 5.8 10.4 5.5 12 5.5s3 .3 4.5 1c1.7 2.5 2.5 5.2 2.8 8.3-1.3 1-2.7 1.6-4.2 2l-1-1.6M7.5 6.5C5.8 9 5 11.7 4.7 14.8c1.3 1 2.7 1.6 4.2 2l1-1.6"/><circle cx="9.6" cy="12" r="1.1"/><circle cx="14.4" cy="12" r="1.1"/></svg>Discord Server</a>
+    <button class="menuItem" id="menuDev" style="display:none;" onclick="menuGo('dev')"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.5 3.2 7.8 8 9 4.8-1.2 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Developer panel</button>
+    <button class="menuItem" onclick="menuGo('loader')"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Script Loader</button>
+    <button class="menuItem" onclick="menuGo('upload')"><svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg>Upload Script</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SWITCH ACCOUNT MODAL -->
+<div class="overlay" id="switchAccountOverlay">
+  <div class="modal">
+    <button class="modalClose" onclick="closeSwitchAccount()">✕</button>
+    <div class="modalTitle" style="text-align:left; margin-bottom:6px;">Switch Account</div>
+    <p style="color:var(--muted); margin:0 0 10px;">Accounts previously used on this device. You'll still need to retype your password for security.</p>
+    <div id="knownAccountsList"></div>
+    <button class="btn ghost" style="width:100%; margin-top:16px;" onclick="openNewAccountLogin()">Use Another Account</button>
+  </div>
+</div>
+
+<!-- CODE VIEWER MODAL -->
+<div class="overlay" id="codeViewerOverlay">
+  <div class="modal">
+    <button class="modalClose" onclick="closeCodeViewer()">✕</button>
+    <div class="modalTitle" style="text-align:left; margin-bottom:2px;" id="codeViewerTitle">code.lua</div>
+    <p style="color:var(--muted); margin:0 0 14px;" id="codeViewerLang">Code</p>
+    <div class="slotView" style="margin-top:0;">
+      <div class="slotViewHead">Code
+        <button class="copyBtn" onclick="copyViewerCode()">Copy</button>
+      </div>
+      <pre class="codeView" id="codeViewerContent" style="max-height:50vh; overflow:auto;"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs (compat build — works as plain <script>, no bundler needed) -->
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-database-compat.js"></script>
+
+<script src="/app.js"></script>
+</body>
+</html>
